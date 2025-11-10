@@ -18,9 +18,10 @@ export default function App() {
   const [precipUnit, setPrecipUnit] = useState("mm");
   const [selectedDate, setSelectedDate] = useState("");
   const [city, setCity] = useState("");
+
   useEffect(() => {
     if (city) fetchWeather(city);
-  }, [tempUnit]);
+  }, [city, tempUnit]); // ✅ اصلاح useEffect
 
   const fetchWeather = async (searchCity) => {
     setCity(searchCity);
@@ -32,14 +33,12 @@ export default function App() {
     setSelectedDate("");
 
     try {
-
       const res = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=${API_KEY}&units=${tempUnit}`
       );
       if (!res.ok) throw new Error("Failed to fetch current weather");
       const data = await res.json();
       setWeatherData(data);
-
 
       const forecastRes = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?q=${searchCity}&units=${tempUnit}&appid=${API_KEY}`
@@ -48,7 +47,6 @@ export default function App() {
       const forecastData = await forecastRes.json();
 
       setHourlyData(forecastData.list);
-
 
       const dailyMap = {};
       forecastData.list.forEach((item) => {
@@ -107,7 +105,6 @@ export default function App() {
   return (
     <div className="w-full overflow-x-hidden">
       <div className="min-h-screen flex flex-col items-center w-full p-4 font-sans">
-      
         <Header
           tempUnit={tempUnit}
           setTempUnit={setTempUnit}
@@ -117,22 +114,17 @@ export default function App() {
           setPrecipUnit={setPrecipUnit}
         />
 
-     
         <div className="mb-8 font-extrabold text-3xl text-center max-sm:text-xl break-words">
           How is the sky looking today?
         </div>
 
-      
         <div className="w-full px-1 md:px-20 lg:px-40 xl:px-60 2xl:px-80">
           <SearchBar onSearch={fetchWeather} />
         </div>
 
-  
         {error && <p className="text-red-500 mt-4">{error}</p>}
 
-   
-        <div className=" flex w-full mt-4 max-md:flex-col gap-4 max-sm:gap-2">
-   
+        <div className="flex w-full mt-4 max-md:flex-col gap-4 max-sm:gap-2">
           <div className="w-3/4 max-sm:w-full w-full flex flex-col justify-start h-full">
             {loading ? (
               <div className="animate-pulse h-48 bg-gray-400 rounded mb-4 w-full"></div>
@@ -150,7 +142,7 @@ export default function App() {
             )}
 
             {loading ? (
-              <div className="animate-pulse  bg-gray-200 rounded mb-2"></div>
+              <div className="animate-pulse bg-gray-200 rounded mb-2"></div>
             ) : (
               dailyData.length > 0 && (
                 <DailyForecast daily={dailyData} tempUnit={tempUnit} />
@@ -158,7 +150,7 @@ export default function App() {
             )}
           </div>
 
-          <div className=" w-1/4 max-sm:w-full  max-md:w-full flex flex-col  ">
+          <div className="w-1/4 max-sm:w-full max-md:w-full flex flex-col">
             {loading ? (
               <div className="animate-pulse h-full bg-gray-200 rounded"></div>
             ) : (
